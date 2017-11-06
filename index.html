@@ -1,0 +1,364 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>划船自定义地图</title>
+    <!-- <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/> -->
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=24151b8bf5227ea736021f7cacd4bb5d"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <style type="text/css">
+        *{
+            padding:0;
+            margin:0;
+        }
+        #map-content{
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+       }
+       .circlebg{
+            width: 20px;
+            height: 20px;
+            background:rgba(255,255,255,0.6);
+            border-radius: 20px;
+            text-align: center;
+            line-height: 19px;
+            animation: circle .8s infinite;
+            -webkit-animation: circle .8s infinite;
+       }
+       .circlebg .circle-span{
+            width: 10px;
+            height: 10px;
+            background:rgba(255,255,255,0.9);
+            border-radius: 10px;
+            display: inline-block;
+       }
+       .info-content{
+            position: relative;
+            width: 700px;
+            height: 196px;
+            margin-bottom: 130px;
+            margin-left:220px;
+       }
+       .info-content .left-primary,
+       .info-content .right-primary{
+            display: inline-block;
+            vertical-align:top;
+       }
+       .info-content .left-primary{
+            background:rgba(255,255,255,0.8);
+            padding:10px;
+            position: relative;
+       }
+       .left-primary .video-play{
+            display: block;
+            background: url(src/map/play.png) no-repeat;
+            background-size:cover;
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top:-40px;
+            margin-left:-40px;
+            opacity: 0.9;
+       }
+       .left-primary .video-play2{
+            background: url(src/map/play2.png) no-repeat;
+            background-size:cover; 
+       }
+       .right-primary {
+            width: 400px;
+       }
+       .right-primary .btn-box{
+            width: 100%;
+            overflow: hidden;
+        }
+        .btn-box .text-title{
+            font-weight: 500;
+            font-size: 30px;
+            color: #2b2b2b;
+            display: inline-block;
+            padding: 5px 20px;
+            background: rgba(255,255,255,0.6);
+        }
+       .right-primary .text{
+            font-weight: 300;
+            font-size: 20px;
+            color: #fff;
+            margin-left: 20px;
+            margin-top:5px; 
+        }
+        img{
+            display:block;
+        }
+        a{
+          text-decoration: none;
+        }
+        a.btn{
+           padding: 12px 35px;
+            background: #3a9bef;
+            color: #fff;
+            font-weight: 300;
+            font-size: 18px;
+            float: right;
+            border-radius: 4px;
+        }
+        .info-content .line{
+            position: absolute;
+            left: 200px;
+            bottom: -153px;
+            width: 1px;
+            height: 200px;
+            background: #fff;
+            transform: rotate(-30deg);
+            -webkit-transform: rotate(-30deg);
+        }
+        @keyframes circle {
+            0%{
+                background:rgba(255,255,255,0.6);
+            }
+            50%{
+               background:rgba(255,255,255,0.3);
+            }
+            100%{
+                background:rgba(255,255,255,0.6);
+            }
+        }
+        @-webkit-keyframes circle {
+             0%{
+                background:rgba(255,255,255,0.6);
+            }
+            50%{
+               background:rgba(255,255,255,0.3);
+            }
+            100%{
+                background:rgba(255,255,255,0.6);
+            }
+        }
+        .amap-toolbar{
+            left: 0% !important;
+            display: none !important;;
+        }
+        .mapreturn{
+            width: 180px;
+            height: 180px;
+            display:block;
+            background: url(src/map/return.png) no-repeat;
+            background-size:cover;
+            position: absolute;
+            left: 0;
+            top: 0; 
+        }
+        .pop-time-contant{
+            position: fixed;
+            top: 0;
+            left: 0;
+            background:rgba(0,0,0,0.6);
+            width: 100%;
+            height: 100%;
+        }
+        .pop-time-contant .voice-hint{
+            width: 500px;
+            background: #4d4c5e;
+            color: #fff;
+            font-weight: 300;
+            text-align: center;
+            border-radius:20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -250px;
+            margin-top:-125px;
+            padding: 20px 10px;
+        }
+        .voice-hint .hint-text{
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin-top:10px; 
+            line-height: 40px;
+            margin-bottom:20px;
+        }
+        .voice-hint .iconfont{
+            width:60px;
+            height: 60px; 
+            display: inline-block;
+            background:url(src/map/makefeng.png) no-repeat;
+            background-size:cover;
+        }
+    </style>
+</head>
+<body>
+<div id="map-content"></div>
+<!-- <div class="info-content">
+    <div class="left-primary">
+        <img src="src/map/huangpujiang.jpg" width="100%" height="100%">
+        <span class="video-play"></span>
+    </div>
+    <div class="right-primary">
+        <p class="btn-box">
+            <span class="text-title">黄浦江</span>
+            <a href="javascript:;" class="btn video-play">立即体验</a>
+        </p>
+        <p class="text">黄浦江是上海的地标河流，流经上海市区，将上海分成浦西和浦东。黄浦江是上海的重要水道，在上海市中心外白渡桥接纳吴淞江（苏州河）后在吴淞口注入长江，是长江汇入东海之前的最后一条支流</p>
+    </div>
+    <div class="line"></div>
+</div> -->
+<a href="#" class="mapreturn" id="mapreturn"></a>
+<div id="js-data-hide" style="display: none;">
+    
+</div>
+<div class="pop-time-contant" style="display: none;">
+    <div class="voice-hint">
+        <p class="hint-text">请您对我说出:<br>视频教学,单人训练,我要比赛,我的数据</p>
+        <p class="mt10">
+            <i class="iconfont icon-maikefeng"></i>
+        </p>
+    </div>
+</div>
+<script type="text/javascript">
+    var map = new AMap.Map('map-content',{
+            resizeEnable: true,
+            zoom:8,
+            center: [121.517798,31.273252],
+            mapStyle:'amap://styles/cb66139bf5eabba2a64ea74de9b7fb95'
+        }); //初始化地图
+    var mapdata = [
+            {
+                "riverName":"黄浦江",
+                "coord":[121.504025,31.248192],
+                "infoHtml":[{
+                    "imgSrc":"src/map/huangpujiang.jpg",
+                    "title":"黄浦江",
+                    "Information":"黄浦江是上海的地标河流，流经上海市区，将上海分成浦西和浦东。"
+                }],
+                "videoUrl":"xxxxxxx1"
+            },
+            {
+                "riverName":"周庄",
+                "coord":[120.850993,31.11535],
+                "infoHtml":[{
+                    "imgSrc":"src/map/zhouzhuang.jpg",
+                    "title":"周庄",
+                    "Information":"黄浦江是上海的地标河流，流经上海市区，将上海分成浦西和浦东。"
+                }],
+                "videoUrl":"xxxxxxx2"
+            },
+            {
+                "riverName":"同里",
+                "coord":[121.097821,31.270882],
+                "infoHtml":[{
+                    "imgSrc":"src/map/tongli.jpg",
+                    "title":"同里",
+                    "Information":"黄浦江是上海的地标河流，流经上海市区，将上海分成浦西和浦东。"
+                }],
+                "videoUrl":"xxxxxxx2"
+            },
+            {
+                "riverName":"朱家角",
+                "coord":[121.05388,31.109867],
+                "infoHtml":[{
+                    "imgSrc":"src/map/zhujiajiao.jpg",
+                    "title":"朱家角",
+                    "Information":"黄浦江是上海的地标河流，流经上海市区，将上海分成浦西和浦东。"
+                }],
+                "videoUrl":"xxxxxxx2"
+            }
+        ];
+    function addMarker(option){
+        var div = '<div class="circlebg"><span class="circle-span"></span></div>',
+            Marker,
+            result,
+            infoWindow = new AMap.InfoWindow({
+                isCustom: true,  //使用自定义窗体
+                offset: new AMap.Pixel(0,0)
+            });
+            map.clearMap();
+            option.data = mapdata;
+            for (var i=0;i<option.data.length;i++){
+                    Marker = new AMap.Marker({
+                        map: map,
+                        position: option.data[i].coord,
+                        content: div,
+                        offset: new AMap.Pixel(0, 0),
+                        zIndex:10
+                    });
+                    Marker.content = '<div class="info-content">';
+                    Marker.content += '<div class="left-primary" onclick="returnVideo()">';
+                    Marker.content += '<img src="'+option.data[i].infoHtml[0].imgSrc+'" width="100%" height="100%">';
+                    Marker.content += '<span class="video-play"></span>';
+                    Marker.content += '</div>';
+                    Marker.content += '<div class="right-primary">';
+                    Marker.content += '<p class="btn-box">';
+                    Marker.content += '<span class="text-title">'+option.data[i].infoHtml[0].title+'</span>';
+                    Marker.content += '<a href="javascript:;" class="btn video-play" onclick="map.clearInfoWindow()">关闭</a>';
+                    Marker.content += '</p>';
+                    Marker.content += ' <p class="text">'+option.data[i].infoHtml[0].Information+'</p>';
+                    Marker.content += '</div>';
+                    Marker.content += '<input type="text" value="'+option.data[i].videoUrl+'" style="display:none" id="js-video-src">';
+                    Marker.content += '<input type="text" value="'+option.data[i].riverName+'" style="display:none" id="js-riverName">';
+                    Marker.content += '<div class="line"></div>';
+                    Marker.content += '</div>';
+                    Marker.on('click',function(e){
+                         map.setZoomAndCenter(8,e.target.getPosition());
+                         infoWindow.open(map,e.target.getPosition());
+                         infoWindow.setContent(e.target.content);
+                         //alert('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
+                         //returnVideo(e.lnglat.getLng(),e.lnglat.getLat());
+                         //console.log(e.target);
+                         document.getElementById('js-data-hide').innerHTML=e.target.content;
+                         result = {"riverName":document.getElementById('js-riverName').value,"videoUrl":document.getElementById('js-video-src').value};
+                    });
+            }
+           //关闭信息窗体
+            function closeInfoWindow() {
+                map.clearInfoWindow();
+            }
+
+    }
+    addMarker({data:mapdata});
+
+    function returnVideo(site){ //点击播放或语音播放
+        var result = {"riverName":document.getElementById('js-riverName').value,"videoUrl":document.getElementById('js-video-src').value};
+            console.log(result);
+    }
+    
+    function voiceControl(site){
+        var html = [],
+            infoWindow;
+            for(var i=0;i<mapdata.length;i++){
+                if(mapdata[i].riverName == site){
+                    html.push('<div class="info-content">'
+                                +'<div class="left-primary" onclick="returnVideo()">'
+                                +'<img src="'+mapdata[i].infoHtml[0].imgSrc+'" width="100%" height="100%">'
+                                +'<span class="video-play"></span>'
+                                +'</div>'
+                                +'<div class="right-primary">'
+                                +'<p class="btn-box">'
+                                +'<span class="text-title">'+mapdata[i].infoHtml[0].title+'</span>'
+                                +'<a href="javascript:;" class="btn video-play" onclick="map.clearInfoWindow()">关闭</a>'
+                                +'</p>'
+                                +' <p class="text">'+mapdata[i].infoHtml[0].Information+'</p>'
+                                +'</div>'
+                                +'<input type="text" value="'+mapdata[i].videoUrl+'" style="display:none" id="js-video-src">'
+                                +'<input type="text" value="'+mapdata[i].riverName+'" style="display:none" id="js-riverName">'
+                                +'<div class="line"></div>'
+                                +'</div>');
+                        infoWindow = new AMap.InfoWindow({
+                            isCustom: true,  //使用自定义窗体
+                            offset: new AMap.Pixel(0,0),
+                            content:html.join('')
+                        });
+                        infoWindow.open(map,mapdata[i].coord);
+                        document.getElementById('js-data-hide').innerHTML = html.join('');
+                }
+            }
+    }
+    //voiceControl('黄浦江');
+</script>
+</body>
+</html>
